@@ -21,9 +21,11 @@ defmodule PedemoWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PedemoWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", PedemoWeb do
+    pipe_through :api
+
+    resources "/reminders", ReminderController, except: [:new, :edit]
+  end
 
   # Enables LiveDashboard only for development
   #
