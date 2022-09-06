@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  db:
+    image: "postgres:11-alpine"
+    container_name: "db"
+    restart: unless-stopped
+    volumes:
+      - "./data/postgres:/var/lib/postgresql/data"
+    environment:
+      - "POSTGRES_USER=${DB_USERNAME:-postgres}"
+      - "POSTGRES_PASSWORD=${DB_PASSWORD:-password}"
+      - "POSTGRES_DB=${DB_DATABASE:-pedemo}"
+    expose:
+      - 5432
+    networks:
+      - pedemo-database
+  phoenix:
+    build:
+      context: "."
+    container_name: "phoenix"
+    restart: unless-stopped
+    volumes:
+      - "./:/app"
+      - "/app/_build"
+      - "/app/deps"
+    environment:
+      - "DB_HOST=${DB_HOST:-db}"
+      - "DB_PORT=${DB_PORT:-5432}"
+      - "DB_USERNAME=${DB_USERNAME:-postgres}"
+      - "DB_PASSWORD=${DB_PASSWORD:-password}"
+      - "DB_DATABASE=${DB_DATABASE:-pedemo}"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    networks:
+      - pedemo-database
+
+networks:
+  pedemo-database:
+    name: "pedemo-database"
